@@ -5,34 +5,51 @@ import IO from 'socket.io';
 export default class MonitorStream {
 
   constructor(server) {
+    this.isMonitoring = false;
     this.io = IO(server);
+    this.threshold = os.cpus().length;
+    this.status = 'normal';
+  }
+
+  checkStatus() {
+    const load = os.loadavg()[0];
+
+    if (load > this.threshold && this.status === 'normal') {
+      this.status = 'danger';
+      this.sendStatus({ load });
+    } else if (this.status === 'danger') {
+      this.status = 'normal';
+      this.sendStatus();
+    }
+    console.log('Status: ' + this.status);
   }
 
   connect(endpoint) {
     return new Promise((resolve, reject)=> {
-      this.io.of(endpoint).on('connection', function(socket) {
+      this.io.of(endpoint).on('connection', (socket)=> {
         this.socket = socket;
-        startMonitoring();
-        resolve(socket);
+
+        if (!this.isMonitoring) {
+          this.startMonitoring();
+          resolve(socket);
+        }
+
       });
     });
   }
   
-  loadAlert(event) {
+  loadAlert() {
     const timestamp = new Date().getTime();
-    const load = os.loadAvg()[0];
+    const load = os.loadavg()[0];
 
-    sendMessage('danger', { load, timestamp });
-  }
+    this.status = 'danger';
 
-  sendMessage(type, message={}) {
-    message.status = type;
-    this.socket.emit('message', message);
+    this.sendStatus({ load, timestamp });
   }
 
   monitor(event) {
     const timestamp = new Date().getTime();
-    const loadAvg = os.loadAvg();
+    const loadAvg = os.loadavg();
     const freeMem = os.freemem();
     const totalMem = os.totalmem();
     const uptime = os.uptime();
@@ -46,10 +63,19 @@ export default class MonitorStream {
     });
   }
 
+  sendStatus(message={}) {
+    message.status = this.status;
+    message.timestamp = new Date().getTime();
+
+    this.socket.emit('message', message);
+  }
 
   startMonitoring() {
-    monitor.on('monitor', monitor);
-    monitor.throttle('loadavg1', loadAlert, monitor.minutes(2));
+    this.isMonitoring = true;
+
+    monitor.on('monitor', this.monitor.bind(this));
+
+    this.statusTimer = setInterval(this.checkStatus.bind(this), 120000);
 
     monitor.start({
       delay: 10000,

@@ -16,6 +16,7 @@
     "bootstrap": "^4.0.0-alpha.2",
     "express": "^4.13.4",
     "flux": "^2.1.1",
+    "moment": "^2.11.2",
     "os-monitor": "^1.0.4",
     "react": "^0.14.7",
     "react-dom": "^0.14.7",

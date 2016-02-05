@@ -8,7 +8,8 @@ function infinite_loop {
 
 # Either use environment variables for DURATION, or define them here
 NUM_CPU=$(grep -c ^processor /proc/cpuinfo 2>/dev/null || sysctl -n hw.ncpu)
-DURATION=$(($NUM_CPU*10))
+SPIKE=$(($NUM_CPU*10))
+DURATION=${1:-$SPIKE}
 PIDS=()
 for i in `seq ${NUM_CPU}` ;
 do

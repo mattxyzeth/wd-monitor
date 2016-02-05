@@ -9,3 +9,4 @@ import './styles/app';
 ReactDOM.render(<App />, document.getElementById('main'));
 
 AppActions.streamData();
+AppActions.listenForMessages();
