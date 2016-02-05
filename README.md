@@ -4,8 +4,18 @@
 
 ### Installation
 
-Requires: Babel and Webpack
-
 ```
-npm install -g babel webpack webpack-dev-server
+npm install
+```
+
+### Dev environment
+
+Server: (listens on port 3000)
+```
+npm run server
+```
+
+Frontend: (listens on port 3001)
+```
+npm run start
 ```
