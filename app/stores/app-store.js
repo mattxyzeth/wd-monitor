@@ -4,9 +4,21 @@ import { EventEmitter } from 'events';
 
 const CHANGE_EVENT = 'change';
 
-let messages = [{ status: 'danger', load: '12.234', timestamp: new Date().getTime() }];
-//let messages = [];
+//let messages = [{ status: 'danger', load: '12.234', timestamp: new Date().getTime() }];
+let messages = [];
 let currentLoad = {};
+
+function addMessages(data) {
+  if (data.constructor !== Array) {
+    data = [data];
+  }
+
+  messages = [...data, ...messages];
+}
+
+function clearMessages() {
+  messages = [];
+}
 
 const AppStore = Object.assign(EventEmitter.prototype, {
   emitChange() {
@@ -22,13 +34,7 @@ const AppStore = Object.assign(EventEmitter.prototype, {
   },
 
   getMessages() {
-    console.log(messages);
     return messages;
-  },
-
-  clearMessages() {
-    messages = [];
-    AppStore.emitChange(); 
   },
 
   getLoad() {
@@ -40,11 +46,13 @@ const AppStore = Object.assign(EventEmitter.prototype, {
 
     switch (actionType) {
       case AppConstants.MESSAGE_RECEIVED:
-        console.log(data);
-        messages.unshift(data);
+        addMessages(data);
         break;
       case AppConstants.STREAM_DATA:
         currentLoad = data;
+        break;
+      case AppConstants.CLEAR_MESSAGES:
+        clearMessages();
         break;
     }
 

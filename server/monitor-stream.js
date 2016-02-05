@@ -1,6 +1,7 @@
 import monitor from 'os-monitor';
 import os from 'os';
 import IO from 'socket.io';
+import db from './db';
 
 export default class MonitorStream {
 
@@ -17,10 +18,11 @@ export default class MonitorStream {
     if (load > this.threshold && this.status === 'normal') {
       this.status = 'danger';
       this.sendStatus({ load });
-    } else if (this.status === 'danger') {
+    } else if (load < this.threshold && this.status === 'danger') {
       this.status = 'normal';
       this.sendStatus();
     }
+
     console.log('Status: ' + this.status);
   }
 
@@ -33,6 +35,12 @@ export default class MonitorStream {
           this.startMonitoring();
           resolve(socket);
         }
+
+        db.getMessages().then(messages => {
+          if (messages) {
+            this.socket.emit('message', messages);
+          }
+        });
 
       });
     });
@@ -67,6 +75,8 @@ export default class MonitorStream {
     message.status = this.status;
     message.timestamp = new Date().getTime();
 
+    db.saveMessage(message);
+
     this.socket.emit('message', message);
   }
 
@@ -75,7 +85,7 @@ export default class MonitorStream {
 
     monitor.on('monitor', this.monitor.bind(this));
 
-    this.statusTimer = setInterval(this.checkStatus.bind(this), 120000);
+    this.statusTimer = setInterval(this.checkStatus.bind(this), 1000);
 
     monitor.start({
       delay: 10000,
