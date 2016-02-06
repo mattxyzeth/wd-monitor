@@ -8,7 +8,6 @@ const dataService = new DataService('http://localhost:3000', 'monitor');
 export default {
   streamData() {
     dataService.listen('monitor', (data)=> {
-      console.log(data);
       dispatch({
         actionType: AppConstants.STREAM_DATA, data
       });

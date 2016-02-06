@@ -7,7 +7,7 @@ const {
 export default class Navigation extends Component {
   render() {
     return <nav className='navbar navbar-dark'>
-      <a className="navbar-brand" href="#">Load Monitor</a>
+      <a className="navbar-brand" href="#">WatchDog</a>
     </nav>;
   }
 }

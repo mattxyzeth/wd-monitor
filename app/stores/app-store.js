@@ -6,7 +6,8 @@ const CHANGE_EVENT = 'change';
 
 //let messages = [{ status: 'danger', load: '12.234', timestamp: new Date().getTime() }];
 let messages = [];
-let currentLoad = {};
+
+let data = [];
 
 function addMessages(data) {
   if (data.constructor !== Array) {
@@ -18,6 +19,14 @@ function addMessages(data) {
 
 function clearMessages() {
   messages = [];
+}
+
+function addData(newData) {
+  if (newData.constructor !== Array) {
+    newData = [newData];
+  }
+
+  data = [...newData, ...data].slice(0,40);
 }
 
 const AppStore = Object.assign(EventEmitter.prototype, {
@@ -41,6 +50,10 @@ const AppStore = Object.assign(EventEmitter.prototype, {
     return currentLoad;
   },
 
+  getData() {
+    return data;
+  },
+
   dispatcherIndex: register(function(payload) {   
     const { actionType, data } = payload;
 
@@ -49,7 +62,7 @@ const AppStore = Object.assign(EventEmitter.prototype, {
         addMessages(data);
         break;
       case AppConstants.STREAM_DATA:
-        currentLoad = data;
+        addData(data);
         break;
       case AppConstants.CLEAR_MESSAGES:
         clearMessages();

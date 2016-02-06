@@ -19,7 +19,7 @@ function label(message) {
 }
 
 function formatTime(timestamp) {
-  return moment(timestamp).format('dddd, MMM Do YYYY [at] h:mm:ss a');
+  return moment(timestamp).format('dddd, MMM Do [at] h:mm:ss a');
 }
 
 export default (props) => { 

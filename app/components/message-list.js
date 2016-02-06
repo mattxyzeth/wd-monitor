@@ -23,7 +23,6 @@ export default class MessageList extends React.Component {
   }
 
   _onChange() {
-    console.log('did change');
     this.setState( getMessages );
   }
 

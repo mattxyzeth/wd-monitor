@@ -23,7 +23,7 @@ export default class MonitorStream {
       this.sendStatus();
     }
 
-    console.log('Status: ' + this.status);
+    //console.log('Status: ' + this.status);
   }
 
   connect(endpoint) {
@@ -36,9 +36,21 @@ export default class MonitorStream {
           resolve(socket);
         }
 
-        db.getMessages().then(messages => {
+        db.get('messages').then(messages => {
           if (messages) {
             this.socket.emit('message', messages);
+          }
+        });
+
+        db.get('snapshots').then(snapshots => {
+          if (snapshots && snapshots.length) {
+            const totalMem = os.totalmem();
+
+            snapshots.forEach(snapshot => {
+              snapshot.totalMem = totalMem;
+            });
+
+            this.socket.emit('monitor', snapshots);
           }
         });
 
@@ -46,36 +58,32 @@ export default class MonitorStream {
     });
   }
   
-  loadAlert() {
-    const timestamp = new Date().getTime();
-    const load = os.loadavg()[0];
-
-    this.status = 'danger';
-
-    this.sendStatus({ load, timestamp });
-  }
-
   monitor(event) {
     const timestamp = new Date().getTime();
-    const loadAvg = os.loadavg();
+    const [ loadAvg1, loadAvg5, loadAvg15 ] = os.loadavg();
     const freeMem = os.freemem();
-    const totalMem = os.totalmem();
     const uptime = os.uptime();
 
-    this.socket.emit('monitor', {
-      timestamp,
-      loadAvg,
+    const snapshot = {
       freeMem,
-      totalMem,
-      uptime
-    });
+      uptime,
+      loadAvg1,
+      loadAvg5,
+      loadAvg15,
+      timestamp
+    };
+
+    db.save('snapshots', snapshot);
+
+    snapshot.totalMem = os.totalmem();
+    this.socket.emit('monitor', snapshot);
   }
 
   sendStatus(message={}) {
     message.status = this.status;
     message.timestamp = new Date().getTime();
 
-    db.saveMessage(message);
+    db.save('message', message);
 
     this.socket.emit('message', message);
   }
@@ -85,7 +93,7 @@ export default class MonitorStream {
 
     monitor.on('monitor', this.monitor.bind(this));
 
-    this.statusTimer = setInterval(this.checkStatus.bind(this), 1000);
+    this.statusTimer = setInterval(this.checkStatus.bind(this), 10000);
 
     monitor.start({
       delay: 10000,
