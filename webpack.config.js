@@ -28,7 +28,7 @@ module.exports = {
     loaders: [
       {
         test: /\.jsx?$/,
-        exclude: /(node_modules|bower_components)/,
+        exclude: /node_modules/,
         loaders: ['babel-loader']
       },
       {
@@ -47,6 +47,6 @@ module.exports = {
   ],
   resolve: {
     extensions: ['', '.js', '.sass'],
-    modulesDirectories: ['src', 'node_modules']
+    modulesDirectories: ['app', 'node_modules']
   }
 };

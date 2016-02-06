@@ -1,13 +1,12 @@
 {
   "name": "wd-monitor",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "This is a simple little app that monitors your systems vitals and displays a running history. Alerts will display in the dashboard when the load average exceeds your CPU threshold and when they return to a normal level.",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --port 3001",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "babel-node server/index.js",
-    "monitor": "babel-node server/monitor.js"
+    "server": "babel-node server/src/index.js"
   },
   "author": "",
   "license": "ISC",

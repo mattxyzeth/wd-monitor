@@ -27,4 +27,3 @@ do
     kill $pid
     killall yes
 done
-
