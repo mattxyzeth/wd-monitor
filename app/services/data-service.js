@@ -1,9 +1,11 @@
-import io from 'socket.io-client/socket.io';
+import io from 'socket.io-client';
 
 export default class DataService {
 
   constructor(host, endpoint) {
-    this.socket = io.connect([host, endpoint].join('/'));
+    if (host || endpoint) {
+      this.socket = io.connect([host, endpoint].join('/'));
+    }
   }
 
   listen(channel, callback) {

@@ -24,6 +24,7 @@ module.exports = {
     inline: true,
     contentBase: './dist'
   },
+  devtool: 'eval, source-maps',
   module: {
     loaders: [
       {

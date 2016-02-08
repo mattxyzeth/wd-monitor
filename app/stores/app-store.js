@@ -2,34 +2,18 @@ import AppConstants from '../constants/app-constants';
 import { register } from '../dispatchers/app-dispatcher';
 import { EventEmitter } from 'events';
 
-const CHANGE_EVENT = 'change';
+const {
+  MESSAGE_RECEIVED,
+  STREAM_DATA,
+  CLEAR_MESSAGES,
+  CHANGE_EVENT
+} = AppConstants;
 
-//let messages = [{ status: 'danger', load: '12.234', timestamp: new Date().getTime() }];
-let messages = [];
-
-let data = [];
-
-function addMessages(data) {
-  if (data.constructor !== Array) {
-    data = [data];
-  }
-
-  messages = [...data, ...messages];
-}
-
-function clearMessages() {
-  messages = [];
-}
-
-function addData(newData) {
-  if (newData.constructor !== Array) {
-    newData = [newData];
-  }
-
-  data = [...newData, ...data].slice(0,40);
-}
 
 const AppStore = Object.assign(EventEmitter.prototype, {
+  messages: [],
+  data: [],
+
   emitChange() {
     this.emit(CHANGE_EVENT);
   },
@@ -42,30 +26,59 @@ const AppStore = Object.assign(EventEmitter.prototype, {
     this.removeListener(CHANGE_EVENT, callback);
   },
 
-  getMessages() {
-    return messages;
+  /**
+   * Merge new messages with the current store of messages.
+   *
+   * @method addMessages
+   * @param data {Object|Array} The message or messages to merge
+   * @return undefined
+   */
+  addMessages(data) {
+    if (data.constructor !== Array) {
+      data = [data];
+    }
+
+    this.messages = [...data, ...this.messages];
   },
 
-  getLoad() {
-    return currentLoad;
+  /**
+   * Resets the messages store to an empty array
+   * 
+   * @method clearMessages
+   * @return undefinfed
+   */
+  clearMessages() {
+    this.messages = [];
+  },
+
+  addData(newData) {
+    if (newData.constructor !== Array) {
+      newData = [newData];
+    }
+
+    this.data = [...newData, ...this.data].slice(0,60);
+  },
+
+  getMessages() {
+    return this.messages;
   },
 
   getData() {
-    return data;
+    return this.data;
   },
 
   dispatcherIndex: register(function(payload) {   
     const { actionType, data } = payload;
 
     switch (actionType) {
-      case AppConstants.MESSAGE_RECEIVED:
-        addMessages(data);
+      case MESSAGE_RECEIVED:
+        AppStore.addMessages(data);
         break;
-      case AppConstants.STREAM_DATA:
-        addData(data);
+      case STREAM_DATA:
+        AppStore.addData(data);
         break;
-      case AppConstants.CLEAR_MESSAGES:
-        clearMessages();
+      case CLEAR_MESSAGES:
+        AppStore.clearMessages();
         break;
     }
 

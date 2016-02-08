@@ -3,7 +3,17 @@ import { dispatch } from '../dispatchers/app-dispatcher';
 import DataService from '../services/data-service';
 import $ from 'jquery';
 
-const dataService = new DataService('http://localhost:3000', 'monitor');
+let host;
+switch(window.env) {
+  case 'development':
+    host = 'http://localhost:3000';
+    break;
+  default:
+    host = window.location.origin;
+    break;
+}
+
+const dataService = new DataService(host, 'monitor');
 
 export default {
   streamData() {
@@ -16,6 +26,7 @@ export default {
 
   listenForMessages() {
     dataService.listen('message', (data)=> {
+      console.log(data);
       if (data) {
         dispatch({
           actionType: AppConstants.MESSAGE_RECEIVED, data
@@ -26,7 +37,7 @@ export default {
 
   clearMessages() {
     $.ajax({
-      url: 'http://localhost:3000/messages',
+      url: host,
       type: 'delete',
       success: ()=> {
         dispatch({

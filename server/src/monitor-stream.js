@@ -1,15 +1,23 @@
 import monitor from 'os-monitor';
 import os from 'os';
 import IO from 'socket.io';
-import db from './db';
+import { db } from './db';
 
 export default class MonitorStream {
 
-  constructor(server) {
+  constructor(server, options={}) {
     this.isMonitoring = false;
-    this.io = IO(server);
     this.threshold = os.cpus().length;
     this.status = 'normal';
+    this.messageDuration = 120000;
+
+    if (options.messageDuration) {
+      this.messageDuration = options.messageDuration;
+    }
+
+    if (server) {
+      this.io = IO(server);
+    }
   }
 
   checkStatus() {
@@ -20,10 +28,10 @@ export default class MonitorStream {
       this.sendStatus({ load });
     } else if (load < this.threshold && this.status === 'danger') {
       this.status = 'normal';
-      this.sendStatus();
+      this.sendStatus({ load });
     }
 
-    //console.log('Status: ' + this.status);
+    console.log('Status: ' + this.status + ', Load: ' + load);
   }
 
   connect(endpoint) {
@@ -73,7 +81,9 @@ export default class MonitorStream {
       timestamp
     };
 
-    db.save('snapshots', snapshot);
+    db.save('snapshots', snapshot)['catch']((error)=> {
+      console.log(error);
+    });
 
     snapshot.totalMem = os.totalmem();
     this.socket.emit('monitor', snapshot);
@@ -83,7 +93,9 @@ export default class MonitorStream {
     message.status = this.status;
     message.timestamp = new Date().getTime();
 
-    db.save('message', message);
+    db.save('messages', message);
+
+    console.log(message);
 
     this.socket.emit('message', message);
   }
@@ -93,7 +105,7 @@ export default class MonitorStream {
 
     monitor.on('monitor', this.monitor.bind(this));
 
-    this.statusTimer = setInterval(this.checkStatus.bind(this), 10000);
+    this.statusTimer = setInterval(this.checkStatus.bind(this), this.messageDuration);
 
     monitor.start({
       delay: 10000,

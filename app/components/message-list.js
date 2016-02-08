@@ -3,7 +3,7 @@ import AppStore from '../stores/app-store';
 import Message from './message';
 
 function getMessages() {
-  return { messages: AppStore.getMessages() };
+  return { messages: AppStore.messages };
 }
 
 export default class MessageList extends React.Component {

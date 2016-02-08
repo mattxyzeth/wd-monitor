@@ -5,7 +5,7 @@ import d3 from 'd3';
 import AppStore from '../stores/app-store';
 
 function updateC3(previousState) {
-  const data = AppStore.getData();
+  const { data } = AppStore;
   const { c3 } = previousState;
   
   let columns = data.reduce((result, snapshot)=> {

@@ -3,25 +3,32 @@ import fs from 'fs';
 import sqlite3 from 'sqlite3';
 import path from 'path';
 
-class DB {
+const env = process.env.NODE_ENV;
+
+export default class DB {
 
   constructor() {
-    const file = path.join(__dirname, 'data/store.db');
-    const exists = fs.existsSync(file);
+    if (env === 'test') {
+      this.file = path.join(__dirname, 'data/store-test.db');
+    } else {
+      this.file = path.join(__dirname, 'data/store.db');
+    }
+
+    const exists = fs.existsSync(this.file);
 
     sqlite3.verbose();
 
-    this.db = new sqlite3.Database(file);
+    this.db = new sqlite3.Database(this.file);
     this.db.serialize(()=> {
-      this.db.run('CREATE TABLE IF NOT EXISTS messages (status TEXT, load REAL NULL, timestamp INTEGER)');
+      this.db.run('CREATE TABLE IF NOT EXISTS messages (status TEXT, load REAL, timestamp INTEGER)');
       this.db.run('CREATE TABLE IF NOT EXISTS snapshots (freeMem INTEGER, uptime INTEGER, loadAvg1, loadAvg5, loadAvg15, timestamp INTEGER)');
 
-      if (!exists) {
+      if (!exists && env !== 'test') {
         // Seed the DB
         let stmt1 = this.db.prepare('INSERT INTO snapshots VALUES(?, ?, ?, ?, ?, ?)');
 
         const now = new Date().getTime();
-        for (let i=0; i < 40; i++) {
+        for (let i=0; i < 60; i++) {
           let loadAvg = os.loadavg();
           stmt1.run(
             os.freemem(),
@@ -71,7 +78,6 @@ class DB {
   clearMessages() {
     return new Promise((resolve, reject)=> {
       this.db.run('DELETE FROM messages', (err)=> {
-        console.log(...arguments);
         if (err) {
           reject(err);
         } else {
@@ -80,6 +86,7 @@ class DB {
       });
     });
   }
+
 }
 
-export default new DB();
+export const db = new DB();
