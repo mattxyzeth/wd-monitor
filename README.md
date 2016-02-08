@@ -7,7 +7,7 @@ This is a simple little app that monitors your systems vitals and displays a run
 ### Production Environment
 
 ```
-NODE_ENV=production npm install && npm run build
+NODE_ENV=production npm install
 ```
 
 These commands will install the necessary dependencies, build the application and install it to the public folder.
@@ -32,7 +32,9 @@ npm run start
 
 This application includes a stress test script to test the functionality of the message center. The test will run an infinite loop on each core for a predefined amount of time. This will raise the load average of the system above the threshold and cause the server to send an alert.
 
-To manually trigger the stress test run `server/src/load.sh`. The test will complete after 12 times the number of cores (physical and logical) on your system in seconds.
+To manually trigger the stress test run `server/src/load.sh`. The test will complete after 20 times the number of cores (physical and logical) on your system in seconds.
+
+Depending on your system, this might not raise your load average above the threshold, you might need to run the load script for a long time and also have a couple other processes running.
 
 If you'd like to run the test for a set amount of time then call the script with the first argument as the number of seconds. `server/src/load.sh 40` will run the script for 40 seconds.
 
