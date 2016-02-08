@@ -30,7 +30,7 @@ npm run start
 
 ### Stress Test
 
-This application includes a stree test script to test the functionality of the message center. The test will run an infinite loop on each core for a predefined amount of time. This will raise the load average of the system above the threshold and cause the server to send an alert.
+This application includes a stress test script to test the functionality of the message center. The test will run an infinite loop on each core for a predefined amount of time. This will raise the load average of the system above the threshold and cause the server to send an alert.
 
 To manually trigger the stress test run `server/src/load.sh`. The test will complete after 12 times the number of cores (physical and logical) on your system in seconds.
 
@@ -38,7 +38,7 @@ If you'd like to run the test for a set amount of time then call the script with
 
 ### Test
 
-There is a decent test converage for some of the functionality. To run the suite make sure the dev dependencies are installed.
+There is decent test converage for the functionality. To run the suite make sure the dev dependencies are installed.
 
 Run with:
 
