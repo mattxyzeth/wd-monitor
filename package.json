@@ -1,8 +1,9 @@
 {
   "name": "wd-monitor",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "This is a simple little app that monitors your systems vitals and displays a running history. Alerts will display in the dashboard when the load average exceeds your CPU threshold and when they return to a normal level.",
   "main": "index.js",
+  "repo": "https://github.com/mattgrannary/wd-monitor.git",
   "scripts": {
     "start": "webpack-dev-server --port 3001",
     "test": "NODE_ENV=test webpack --config webpack.test.js && mocha './test/**/*.js'",
