@@ -1,6 +1,8 @@
 const autoprefixer = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
+const fs = require('fs');
 
 const sassIncludePaths = [
   path.resolve(__dirname, 'app/styles'),
@@ -13,14 +15,36 @@ const sassLoaders = [
   'sass-loader?indentedSyntax=sass&includePaths[]=' + sassIncludePaths.join('&includePaths[]=')
 ];
 
+const nodeModules = {};
+
+fs.readdirSync('node_modules').filter(function(x) {
+  return ['.bin'].indexOf(x) === -1;
+}).forEach(function(mod) {
+  nodeModules[mod] = 'commonjs ' + mod;
+});
+
 module.exports = [
   {
     name: 'Node/Express Backend',
     entry: path.resolve(__dirname, 'server/src/index.js'),
+    target: 'node',
     output: {
       path: path.join(__dirname, 'server', 'build'),
       filename: 'index.js',
-      target: 'node'
+    },
+    module: {
+      loaders: [
+        {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          loaders: ['babel-loader']
+        }
+      ]
+    },
+    node: {
+      __dirname: true
+    },
+    externals: nodeModules
   },
   {
     name: 'React Front End',
@@ -28,10 +52,9 @@ module.exports = [
       app: path.resolve(__dirname, 'app/index.js'),
       vendors: [
         'babel-polyfill',
-        'bootstrap',
+        'jquery',
         'c3',
         'flux',
-        'jquery',
         'moment',
         'moment-duration-format',
         'react',
@@ -40,14 +63,13 @@ module.exports = [
       ]
     },
     output: {
-      path: path.join(__dirname, 'dist'),
+      path: path.join(__dirname, 'public'),
       filename: 'app.js',
       publicPath: '/'
     },
-    devtool: 'source-maps',
     devServer: {
       inline: true,
-      contentBase: './dist'
+      contentBase: './public'
     },
     module: {
       loaders: [
@@ -64,7 +86,12 @@ module.exports = [
     },
     plugins: [
       new ExtractTextPlugin('app.css'),
-      new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js')
+      new webpack.optimize.CommonsChunkPlugin('vendors', 'vendors.js'),
+      new webpack.ProvidePlugin({
+        $: "jquery",
+        jQuery: "jquery",
+        'window.jQuery': "jquery" 
+      })
     ],
     postcss: [
       autoprefixer({

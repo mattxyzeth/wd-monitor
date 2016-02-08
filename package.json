@@ -7,7 +7,8 @@
   "scripts": {
     "start": "webpack-dev-server --port 3001",
     "test": "NODE_ENV=test webpack --config webpack.test.js && mocha './test/**/*.js'",
-    "server": "babel-node server/src/index.js"
+    "server": "babel-node server/src/index.js",
+    "build": "NODE_ENV=production webpack -p --config webpack.production.js"
   },
   "author": "",
   "license": "ISC",

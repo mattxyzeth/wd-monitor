@@ -1,7 +1,7 @@
 import AppConstants from '../constants/app-constants';
 import { dispatch } from '../dispatchers/app-dispatcher';
 import DataService from '../services/data-service';
-import $ from 'jquery';
+import jQuery from 'jquery';
 
 let host;
 switch(window.env) {
@@ -36,8 +36,8 @@ export default {
   },
 
   clearMessages() {
-    $.ajax({
-      url: host,
+    jQuery.ajax({
+      url: [host, 'messages'].join('/'),
       type: 'delete',
       success: ()=> {
         dispatch({
