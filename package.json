@@ -1,6 +1,6 @@
 {
   "name": "wd-monitor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "This is a simple little app that monitors your systems vitals and displays a running history. Alerts will display in the dashboard when the load average exceeds your CPU threshold and when they return to a normal level.",
   "main": "index.js",
   "repo": "https://github.com/mattgrannary/wd-monitor.git",
